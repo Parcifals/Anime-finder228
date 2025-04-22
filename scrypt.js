@@ -1,69 +1,106 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Элементы DOM
     const searchButton = document.getElementById('searchButton');
     const animeInput = document.getElementById('animeInput');
     const resultsDiv = document.getElementById('results');
-
-    // Обработчик кнопки поиска
+    const errorDiv = document.getElementById('errorMessage');
+    const typeFilter = document.getElementById('typeFilter');
+    const buttonText = document.querySelector('.button-text');
+    const spinner = document.querySelector('.loading-spinner');
+    
+    // Обработчики событий
     searchButton.addEventListener('click', searchAnime);
-
-    // Обработчик нажатия Enter в поле ввода
     animeInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            searchAnime();
-        }
+        if (e.key === 'Enter') searchAnime();
     });
-
+    
+    // Основная функция поиска
     async function searchAnime() {
         const query = animeInput.value.trim();
+        const type = typeFilter.value;
         
+        // Валидация
         if (!query) {
-            showError('Введите название аниме');
+            showError('Пожалуйста, введите название аниме');
             return;
         }
-
+        
         try {
+            // Показываем состояние загрузки
             searchButton.disabled = true;
-            searchButton.textContent = 'Идет поиск...';
+            buttonText.textContent = 'Поиск...';
+            spinner.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
             
-            const response = await fetch(`https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}`);
+            // Формируем URL запроса
+            let url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=12`;
+            if (type) url += `&type=${type}`;
+            
+            // Выполняем запрос
+            const response = await fetch(url);
             
             if (!response.ok) {
-                throw new Error('Ошибка сервера');
+                throw new Error(`Ошибка сервера: ${response.status}`);
             }
             
             const data = await response.json();
-            showResults(data.data);
+            
+            // Обработка результатов
+            if (data.data && data.data.length > 0) {
+                displayResults(data.data);
+            } else {
+                showError('Ничего не найдено. Попробуйте другой запрос.');
+            }
             
         } catch (error) {
-            showError('Ошибка загрузки: ' + error.message);
+            showError(`Ошибка при поиске: ${error.message}`);
+            console.error('Search error:', error);
         } finally {
+            // Восстанавливаем кнопку
             searchButton.disabled = false;
-            searchButton.textContent = 'Поиск';
+            buttonText.textContent = 'Поиск';
+            spinner.classList.add('hidden');
         }
     }
-
-    function showResults(animeList) {
+    
+    // Отображение результатов
+    function displayResults(animeList) {
         resultsDiv.innerHTML = '';
         
-        if (animeList.length === 0) {
-            showError('Ничего не найдено');
-            return;
-        }
-
-        animeList.slice(0, 10).forEach(anime => {
+        animeList.forEach(anime => {
             const card = document.createElement('div');
             card.className = 'anime-card';
             card.innerHTML = `
-                <h3>${anime.title}</h3>
-                <img src="${anime.images?.jpg?.image_url || ''}" alt="${anime.title}" onerror="this.style.display='none'">
-                <p>★ ${anime.score || 'Нет рейтинга'}</p>
-                <p>Эпизоды: ${anime.episodes || '?'}</p>
+                <img src="${anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url || ''}" 
+                     alt="${anime.title}" 
+                     onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+                <div class="anime-info">
+                    <h3>${anime.title}</h3>
+                    <p>★ ${anime.score || 'Нет рейтинга'}</p>
+                    <p>Тип: ${getTypeName(anime.type)}</p>
+                    <p>Эпизоды: ${anime.episodes || '?'}</p>
+                </div>
             `;
             resultsDiv.appendChild(card);
         });
     }
-
+    
+    // Показ ошибок
     function showError(message) {
-        resultsDiv.innerHTML = `<p class="error">${message}</p>`;
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+        resultsDiv.innerHTML = '';
+    }
+    
+    // Преобразование типа
+    function getTypeName(type) {
+        const types = {
+            'tv': 'TV Сериал',
+            'movie': 'Фильм',
+            'ova': 'OVA',
+            'special': 'Спешл',
+            'ona': 'ONA'
+        };
+        return types[type] || type;
     }
 });

@@ -10,15 +10,30 @@
     <div class="container">
         <header>
             <h1>🍥 Ultimate Anime Finder</h1>
-            <p class="subtitle">Поиск по AniList API</p>
+            <p class="subtitle">Поиск аниме через Jikan API (MyAnimeList)</p>
         </header>
         
         <section class="search-section">
-            <input type="text" id="animeInput" placeholder="Введите название аниме...">
-            <button id="searchButton">Поиск</button>
+            <div class="search-box">
+                <input type="text" id="animeInput" placeholder="Например: Naruto, Attack on Titan..." autocomplete="off">
+                <button id="searchButton">
+                    <span class="button-text">Поиск</span>
+                    <div class="loading-spinner hidden"></div>
+                </button>
+            </div>
+            <div class="filters">
+                <select id="typeFilter">
+                    <option value="">Все типы</option>
+                    <option value="tv">TV Сериал</option>
+                    <option value="movie">Фильм</option>
+                    <option value="ova">OVA</option>
+                </select>
+            </div>
         </section>
         
-        <div id="results"></div>
+        <div id="results" class="results-grid"></div>
+        
+        <div id="errorMessage" class="error-message hidden"></div>
     </div>
 
     <script src="script.js"></script>

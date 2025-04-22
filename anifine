@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍥 Anime Elf Finder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Главное меню с эльфийками -->
+    <div class="welcome-screen">
+        <div class="elf-container">
+            <div class="elf elf-left">
+                <img src="https://i.imgur.com/JQ1q5Yl.png" alt="Эльфийка 1" class="elf-image">
+                <div class="speech-bubble">Добро пожаловать, искатель аниме!</div>
+            </div>
+            <div class="elf elf-right">
+                <img src="https://i.imgur.com/6V0WzQ6.png" alt="Эльфийка 2" class="elf-image">
+                <div class="speech-bubble">Найди своё идеальное аниме!</div>
+            </div>
+        </div>
+        <button id="startButton" class="glow-button">Начать поиск</button>
+    </div>
+
+    <!-- Основной контент (изначально скрыт) -->
+    <div class="main-content hidden">
+        <!-- Ваш существующий код -->
+        <div class="container">
+            <!-- ... остальной код ... -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
